@@ -1,70 +1,97 @@
-# Getting Started with Create React App
+# saChess Web Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A real-time chess platform with multiplayer gameplay, puzzle creation, social networking, and global rankings — available as a web and mobile app.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### User System
+- Sign up/login (email + social media)
+- Profile page with stats
+- Progress tracking
+- Daily streak counter
 
-### `npm start`
+### Online Gameplay Features
+- Online multiplayer games with real-time matchmaking
+- Play with friends: Challenge friends and invite them to matches
+- Real-time chat during gameplay
+- Friends system: Add friends, view their profiles, and track progress
+- Leaderboards and global rankings
+- User profiles with chess statistics
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Puzzle Functionality
+- Daily puzzles (new each day)
+- Puzzle categories (tactics, endgames, openings)
+- Difficulty levels (beginner to grandmaster)
+- Hint system (limited uses)
+- Solution explanation after solving
+- Time attack mode (solve puzzles against clock)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Training Features
+- Theme-based training (pins, forks, skewers etc.)
+- Personalized recommendations based on weaknesses
+- Rating system that adjusts to user skill
+- Milestone badges for achievements
 
-### `npm test`
+## Tech Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend
+- React.js for web interface
+- React Router for navigation
+- Axios for API communication
+- Custom chessboard implementation
+- Material-UI for UI components
+- Responsive design for mobile and desktop
 
-### `npm run build`
+### Backend (to be implemented)
+- Java with Spring Boot
+- JWT authentication
+- RESTful API design
+- PostgreSQL database
+- Responsive design for both mobile and desktop
+- Stockfish integration for puzzle validation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Installation
 
-### `npm run eject`
+1. Clone the repository:
+```
+git clone https://github.com/sachin-rathod-1/sachess-webapp.git
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+cd chess-puzzles-web
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. Install dependencies:
+```
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Start the development server:
+```
+npm start
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+4. Open [http://localhost:3000](http://localhost:3000) to view the application in your browser.
 
-## Learn More
+## Backend Setup (Coming Soon)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Instructions for setting up the Spring Boot backend will be provided in a separate repository.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Future Enhancements
 
-### Code Splitting
+- Mobile app using React Native
+- Advanced analytics dashboard
+- Social features (friends, challenges)
+- Tournament mode
+- Integration with popular chess platforms (Lichess, Chess.com)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
+## Acknowledgments
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [Chess.js](https://github.com/jhlywa/chess.js) for chess move validation
+- [Stockfish](https://stockfishchess.org/) for chess engine analysis
+- Open-source puzzle databases

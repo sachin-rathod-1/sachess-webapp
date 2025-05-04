@@ -1,0 +1,125 @@
+.chessboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 1 / 1;
+}
+
+.board.flipped {
+  flex-direction: column-reverse;
+}
+
+.board.flipped .board-row {
+  flex-direction: row-reverse;
+}
+
+.board-row {
+  display: flex;
+  flex: 1;
+}
+
+.square {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.white-square {
+  background-color: #f0d9b5;
+}
+
+.black-square {
+  background-color: #b58863;
+}
+
+.piece {
+  width: 80%;
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.piece img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.selected {
+  background-color: rgba(255, 255, 0, 0.5) !important;
+}
+
+.highlighted {
+  position: relative;
+}
+
+.highlighted::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 255, 0, 0.3);
+  z-index: 0;
+}
+
+.last-move {
+  background-color: rgba(173, 216, 230, 0.5) !important;
+}
+
+.hint-dot {
+  position: absolute;
+  width: 25%;
+  height: 25%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 0;
+}
+
+.coordinate {
+  position: absolute;
+  font-size: 12px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.7);
+  user-select: none;
+}
+
+.rank {
+  left: 2px;
+  top: 2px;
+}
+
+.file {
+  right: 2px;
+  bottom: 2px;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+  .board {
+    max-width: 100%;
+  }
+  
+  .coordinate {
+    font-size: 10px;
+  }
+}

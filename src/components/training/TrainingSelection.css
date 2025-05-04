@@ -1,0 +1,247 @@
+.training-selection-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.training-selection-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.training-selection-header h1 {
+  margin: 0 0 15px 0;
+  font-size: 32px;
+  color: #333;
+}
+
+.training-selection-header p {
+  margin: 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.training-themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 50px;
+}
+
+.theme-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  display: flex;
+  height: 100%;
+}
+
+.theme-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.theme-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f7ff;
+  font-size: 32px;
+  padding: 20px;
+  min-width: 80px;
+}
+
+.theme-content {
+  padding: 20px;
+  flex: 1;
+}
+
+.theme-content h2 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.theme-content p {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.theme-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theme-difficulty {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.theme-count {
+  font-size: 12px;
+  color: #666;
+}
+
+.training-recommendations {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 50px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.training-recommendations h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.training-recommendations > p {
+  margin: 0 0 25px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.recommendation-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.recommendation-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.recommendation-icon {
+  font-size: 24px;
+  margin-right: 15px;
+}
+
+.recommendation-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.recommendation-reason {
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.recommendation-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4d90fe;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.recommendation-button:hover {
+  background-color: #357ae8;
+}
+
+.custom-training {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.custom-training h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.custom-training > p {
+  margin: 0 0 25px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.custom-training-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
+}
+
+.custom-training-button {
+  grid-column: 1 / -1;
+  padding: 12px;
+  background-color: #4d90fe;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.custom-training-button:hover {
+  background-color: #357ae8;
+}
+
+@media (max-width: 768px) {
+  .training-selection-container {
+    padding: 20px 15px;
+  }
+  
+  .training-themes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .recommendation-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .custom-training-form {
+    grid-template-columns: 1fr;
+  }
+}
