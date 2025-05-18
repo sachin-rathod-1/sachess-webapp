@@ -1,6 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import PuzzleView from './PuzzleView';
-import './DailyPuzzle.css';
+import { 
+  Box, 
+  Typography, 
+  Container, 
+  Paper, 
+  Grid, 
+  Card, 
+  CardContent, 
+  Button, 
+  CircularProgress,
+  Alert,
+  Chip
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const StreakChip = styled(Chip)(({ theme }) => ({
+  backgroundColor: theme.palette.warning.light,
+  color: theme.palette.warning.contrastText,
+  fontWeight: 600,
+  '& .MuiChip-icon': {
+    color: theme.palette.warning.dark,
+  }
+}));
+
+const StatCard = styled(Card)(({ theme }) => ({
+  height: '100%',
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-5px)',
+    boxShadow: theme.shadows[8],
+  }
+}));
 
 const DailyPuzzle = () => {
   const [puzzle, setPuzzle] = useState(null);
@@ -98,62 +133,181 @@ const DailyPuzzle = () => {
 
   if (loading) {
     return (
-      <div className="daily-puzzle-container">
-        <div className="daily-puzzle-loading">
-          <div className="spinner"></div>
-          <p>Loading today's puzzle...</p>
-        </div>
-      </div>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: 300 
+          }}
+        >
+          <CircularProgress size={40} />
+          <Typography variant="h6" sx={{ ml: 2 }}>
+            Loading today's puzzle...
+          </Typography>
+        </Box>
+      </Container>
     );
   }
 
   if (error) {
     return (
-      <div className="daily-puzzle-container">
-        <div className="daily-puzzle-error">
-          <h2>Oops!</h2>
-          <p>{error}</p>
-          <button onClick={() => window.location.reload()}>Try Again</button>
-        </div>
-      </div>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            p: 4, 
+            textAlign: 'center',
+            borderRadius: 2,
+            bgcolor: 'error.light',
+            color: 'error.contrastText'
+          }}
+        >
+          <Typography variant="h4" component="h2" gutterBottom>
+            Oops!
+          </Typography>
+          <Typography variant="body1" paragraph>
+            {error}
+          </Typography>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            startIcon={<RefreshIcon />}
+            onClick={() => window.location.reload()}
+            sx={{ mt: 2 }}
+          >
+            Try Again
+          </Button>
+        </Paper>
+      </Container>
     );
   }
 
   return (
-    <div className="daily-puzzle-container">
-      <div className="daily-puzzle-header">
-        <h1>Daily Puzzle</h1>
-        <div className="streak-counter">
-          <span className="streak-flame">🔥</span>
-          <span className="streak-count">{streakCount} day streak</span>
-        </div>
-      </div>
-      
-      {completed ? (
-        <div className="daily-puzzle-completed">
-          <h2>You've completed today's puzzle!</h2>
-          <p>Come back tomorrow for a new challenge.</p>
-          <div className="completed-stats">
-            <div className="stat">
-              <span className="stat-label">Current Streak</span>
-              <span className="stat-value">{streakCount} days</span>
-            </div>
-            <div className="stat">
-              <span className="stat-label">Next Puzzle</span>
-              <span className="stat-value">
-                {new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <PuzzleView 
-          puzzle={puzzle} 
-          onComplete={handlePuzzleComplete} 
-          onFail={handlePuzzleFail} 
+    <Container 
+      maxWidth="lg" 
+      component={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      sx={{ py: 4 }}
+    >
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        mb: 4,
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          sx={{ 
+            fontWeight: 700,
+            background: 'linear-gradient(45deg, #4d90fe 30%, #357ae8 90%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}
+        >
+          Daily Puzzle
+        </Typography>
+        
+        <StreakChip 
+          icon={<LocalFireDepartmentIcon />} 
+          label={`${streakCount} day streak`}
+          size="medium"
         />
-      )}
-    </div>
+      </Box>
+      
+      <AnimatePresence mode="wait">
+        {completed ? (
+          <Paper 
+            component={motion.div}
+            key="completed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            elevation={3} 
+            sx={{ 
+              p: 4, 
+              textAlign: 'center',
+              borderRadius: 2,
+              bgcolor: 'success.light',
+              color: 'success.contrastText',
+              mb: 4
+            }}
+          >
+            <Typography variant="h4" component="h2" gutterBottom>
+              You've completed today's puzzle!
+            </Typography>
+            <Typography variant="body1" paragraph>
+              Come back tomorrow for a new challenge.
+            </Typography>
+            
+            <Grid container spacing={3} sx={{ mt: 3 }}>
+              <Grid item xs={12} sm={6}>
+                <StatCard 
+                  component={motion.div}
+                  whileHover={{ scale: 1.03 }}
+                  elevation={2}
+                >
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <LocalFireDepartmentIcon 
+                      color="warning" 
+                      sx={{ fontSize: 48, mb: 1 }}
+                    />
+                    <Typography variant="h6" color="text.secondary" gutterBottom>
+                      Current Streak
+                    </Typography>
+                    <Typography variant="h4" color="text.primary">
+                      {streakCount} days
+                    </Typography>
+                  </CardContent>
+                </StatCard>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <StatCard 
+                  component={motion.div}
+                  whileHover={{ scale: 1.03 }}
+                  elevation={2}
+                >
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <CalendarTodayIcon 
+                      color="primary" 
+                      sx={{ fontSize: 48, mb: 1 }}
+                    />
+                    <Typography variant="h6" color="text.secondary" gutterBottom>
+                      Next Puzzle
+                    </Typography>
+                    <Typography variant="h4" color="text.primary">
+                      {new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString()}
+                    </Typography>
+                  </CardContent>
+                </StatCard>
+              </Grid>
+            </Grid>
+          </Paper>
+        ) : (
+          <Box 
+            component={motion.div}
+            key="puzzle"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <PuzzleView 
+              puzzle={puzzle} 
+              onComplete={handlePuzzleComplete} 
+              onFail={handlePuzzleFail} 
+            />
+          </Box>
+        )}
+      </AnimatePresence>
+    </Container>
   );
 };
 

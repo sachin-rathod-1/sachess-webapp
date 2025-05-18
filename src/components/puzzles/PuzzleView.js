@@ -1,6 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import Chessboard from '../chessboard/Chessboard';
-import './PuzzleView.css';
+import ChessboardComponent from '../chessboard/Chessboard';
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Paper, 
+  Chip, 
+  Grid, 
+  Card, 
+  CardContent,
+  Alert,
+  CircularProgress,
+  useTheme
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
+import TimerIcon from '@mui/icons-material/Timer';
+import ReplayIcon from '@mui/icons-material/Replay';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const PuzzleHeader = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: theme.spacing(3),
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: theme.spacing(2),
+  }
+}));
+
+const PuzzleTimer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(1, 2),
+  borderRadius: theme.spacing(1),
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[1],
+  [theme.breakpoints.down('sm')]: {
+    alignSelf: 'flex-end',
+  }
+}));
+
+const PuzzleMessage = styled(Alert)(({ theme, status }) => ({
+  marginBottom: theme.spacing(3),
+  animation: status === 'success' || status === 'failed' ? 'pulse 2s infinite' : 'none',
+  '@keyframes pulse': {
+    '0%': {
+      boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.1)',
+    },
+    '70%': {
+      boxShadow: '0 0 0 10px rgba(0, 0, 0, 0)',
+    },
+    '100%': {
+      boxShadow: '0 0 0 0 rgba(0, 0, 0, 0)',
+    },
+  }
+}));
 
 const PuzzleView = ({ puzzle, onComplete, onFail }) => {
   const [currentFen, setCurrentFen] = useState('');
@@ -11,6 +69,7 @@ const PuzzleView = ({ puzzle, onComplete, onFail }) => {
   const [hintsRemaining, setHintsRemaining] = useState(3);
   const [timer, setTimer] = useState(0);
   const [timerInterval, setTimerInterval] = useState(null);
+  const theme = useTheme();
 
   useEffect(() => {
     if (puzzle) {
@@ -120,65 +179,173 @@ const PuzzleView = ({ puzzle, onComplete, onFail }) => {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
+  const getAlertSeverity = () => {
+    switch (status) {
+      case 'success':
+        return 'success';
+      case 'failed':
+        return 'error';
+      case 'solving':
+        return 'info';
+      default:
+        return 'info';
+    }
+  };
+
   if (!puzzle) {
-    return <div className="puzzle-loading">Loading puzzle...</div>;
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: 300 
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h6" sx={{ ml: 2 }}>
+          Loading puzzle...
+        </Typography>
+      </Box>
+    );
   }
 
   return (
-    <div className="puzzle-view">
-      <div className="puzzle-header">
-        <div className="puzzle-info">
-          <h2>Puzzle #{puzzle.id}</h2>
-          <div className="puzzle-details">
-            <span className="puzzle-rating">Rating: {puzzle.rating}</span>
-            <span className="puzzle-theme">Theme: {puzzle.theme}</span>
-          </div>
-        </div>
-        <div className="puzzle-timer">Time: {formatTime(timer)}</div>
-      </div>
+    <Box 
+      component={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      sx={{ maxWidth: 800, mx: 'auto', px: 2 }}
+    >
+      <PuzzleHeader>
+        <Box>
+          <Typography variant="h4" component="h2" gutterBottom>
+            Puzzle #{puzzle.id}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Chip 
+              label={`Rating: ${puzzle.rating}`} 
+              color="primary" 
+              variant="outlined" 
+              size="small"
+            />
+            <Chip 
+              label={`Theme: ${puzzle.theme}`} 
+              color="secondary" 
+              variant="outlined" 
+              size="small"
+            />
+          </Box>
+        </Box>
+        <PuzzleTimer>
+          <TimerIcon sx={{ mr: 1, color: 'text.secondary' }} />
+          <Typography variant="h6" component="span">
+            {formatTime(timer)}
+          </Typography>
+        </PuzzleTimer>
+      </PuzzleHeader>
       
-      <div className="puzzle-board">
-        <Chessboard 
+      <Box sx={{ mb: 4 }}>
+        <ChessboardComponent 
           fen={currentFen} 
           onMove={handleMove} 
           orientation={puzzle.orientation || 'white'} 
           allowMoves={status !== 'success' && status !== 'failed'}
           showHints={showHint}
         />
-      </div>
+      </Box>
       
-      <div className="puzzle-controls">
-        <div className={`puzzle-message ${status}`}>{message}</div>
+      <Box sx={{ mb: 4 }}>
+        <AnimatePresence mode="wait">
+          <PuzzleMessage 
+            component={motion.div}
+            key={message}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            severity={getAlertSeverity()}
+            variant="filled"
+            status={status}
+          >
+            {message}
+          </PuzzleMessage>
+        </AnimatePresence>
         
-        <div className="puzzle-buttons">
+        <Grid container spacing={2} justifyContent="center">
           {status === 'ready' || status === 'solving' ? (
-            <button 
-              className="hint-button" 
-              onClick={handleHint} 
-              disabled={hintsRemaining === 0}
-            >
-              Hint ({hintsRemaining})
-            </button>
+            <Grid item>
+              <Button 
+                variant="contained" 
+                color="primary"
+                startIcon={<LightbulbIcon />}
+                onClick={handleHint}
+                disabled={hintsRemaining === 0}
+                component={motion.button}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Hint ({hintsRemaining})
+              </Button>
+            </Grid>
           ) : (
             <>
-              <button className="try-again-button" onClick={handleTryAgain}>
-                Try Again
-              </button>
-              <button className="next-puzzle-button" onClick={handleNextPuzzle}>
-                Next Puzzle
-              </button>
+              <Grid item>
+                <Button 
+                  variant="outlined" 
+                  color="primary"
+                  startIcon={<ReplayIcon />}
+                  onClick={handleTryAgain}
+                  component={motion.button}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Try Again
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button 
+                  variant="contained" 
+                  color="primary"
+                  endIcon={<ArrowForwardIcon />}
+                  onClick={handleNextPuzzle}
+                  component={motion.button}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Next Puzzle
+                </Button>
+              </Grid>
             </>
           )}
-        </div>
-      </div>
+        </Grid>
+      </Box>
       
       {puzzle.explanation && status === 'success' && (
-        <div className="puzzle-explanation">
-          <h3>Explanation</h3>
-          <p>{puzzle.explanation}</p>
-        </div>
+        <Card 
+          component={motion.div}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          elevation={3}
+          sx={{ 
+            mt: 4, 
+            borderLeft: `4px solid ${theme.palette.success.main}`,
+            borderRadius: 2
+          }}
+        >
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Explanation
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {puzzle.explanation}
+            </Typography>
+          </CardContent>
+        </Card>
       )}
-    </div>
+    </Box>
   );
 };
 

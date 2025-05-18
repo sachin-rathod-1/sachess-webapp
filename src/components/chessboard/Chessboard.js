@@ -1,207 +1,264 @@
-import React, { useState, useEffect } from 'react';
-import './Chessboard.css';
-import { isValidMove, makeMove, getPossibleMoves } from '../../utils/chessLogic';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.js';
+import { Box, Paper, useTheme } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { motion } from 'framer-motion';
 
-const Chessboard = ({ 
-  fen, 
+const ChessboardContainer = styled(Paper)(({ theme }) => ({
+  borderRadius: theme.spacing(1),
+  overflow: 'hidden',
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+  maxWidth: 600,
+  margin: '0 auto',
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  '&:hover': {
+    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.2)',
+  }
+}));
+
+const ChessboardComponent = ({ 
+  fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 
   onMove, 
   orientation = 'white',
   allowMoves = true,
   showHints = false,
-  correctMoves = []
+  correctMoves = [],
+  customSquareStyles = {},
+  skipValidation = true
 }) => {
-  const [board, setBoard] = useState([]);
-  const [selectedSquare, setSelectedSquare] = useState(null);
-  const [highlightedSquares, setHighlightedSquares] = useState([]);
+  const [game, setGame] = useState(new Chess(fen,skipValidation));
+  const [moveFrom, setMoveFrom] = useState('');
+  const [moveTo, setMoveTo] = useState(null);
+  const [showPromotionDialog, setShowPromotionDialog] = useState(false);
+  const [rightClickedSquares, setRightClickedSquares] = useState({});
+  const [optionSquares, setOptionSquares] = useState({});
   const [lastMove, setLastMove] = useState(null);
+  const theme = useTheme();
 
-  // Parse FEN string and set up the board
+  // Update the game when FEN changes
   useEffect(() => {
-    if (fen) {
-      const parsedBoard = parseFen(fen);
-      setBoard(parsedBoard);
+    try {
+      const newGame = new Chess(fen);
+      setGame(newGame);
+    } catch (error) {
+      console.error('Invalid FEN string:', error);
     }
   }, [fen]);
 
-  // Parse FEN string to board representation
-  const parseFen = (fen) => {
-    const fenParts = fen.split(' ');
-    const boardPart = fenParts[0];
-    const rows = boardPart.split('/');
-    
-    const boardArray = [];
-    
-    for (let i = 0; i < 8; i++) {
-      const row = [];
-      let j = 0;
-      
-      for (let char of rows[i]) {
-        if (/[1-8]/.test(char)) {
-          const emptyCount = parseInt(char);
-          for (let k = 0; k < emptyCount; k++) {
-            row.push(null);
-            j++;
-          }
-        } else {
-          row.push(char);
-          j++;
-        }
-      }
-      
-      boardArray.push(row);
-    }
-    
-    return boardArray;
-  };
-
-  // Handle square click
-  const handleSquareClick = (row, col) => {
+  // Get possible moves for a piece
+  const getMoveOptions = useCallback((square) => {
     if (!allowMoves) return;
     
-    const piece = board[row][col];
+    const moves = game.moves({
+      square,
+      verbose: true
+    });
     
-    // If a square is already selected
-    if (selectedSquare) {
-      const [selectedRow, selectedCol] = selectedSquare;
-      const selectedPiece = board[selectedRow][selectedCol];
+    if (moves.length === 0) return;
+    
+    const newSquares = {};
+    moves.forEach((move) => {
+      newSquares[move.to] = {
+        background: showHints 
+          ? 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)'
+          : 'rgba(0, 0, 0, 0.05)',
+        borderRadius: '50%'
+      };
+    });
+    
+    newSquares[square] = {
+      background: 'rgba(255, 255, 0, 0.4)'
+    };
+    
+    setOptionSquares(newSquares);
+    return true;
+  }, [game, allowMoves, showHints]);
+
+  // Handle square click
+  const onSquareClick = useCallback((square) => {
+    if (!allowMoves) return;
+    
+    // Check if we already have a piece selected
+    if (moveFrom) {
+      // Check if the clicked square is a valid move
+      const moves = game.moves({
+        square: moveFrom,
+        verbose: true
+      });
       
-      // If clicking on the same square, deselect it
-      if (selectedRow === row && selectedCol === col) {
-        setSelectedSquare(null);
-        setHighlightedSquares([]);
-        return;
-      }
-      
-      // If clicking on a different square, try to move the piece
-      if (isValidMove(selectedPiece, selectedRow, selectedCol, row, col, board)) {
-        const newBoard = makeMove(selectedRow, selectedCol, row, col, [...board]);
-        setBoard(newBoard);
-        setLastMove({ from: [selectedRow, selectedCol], to: [row, col] });
-        setSelectedSquare(null);
-        setHighlightedSquares([]);
-        
-        // Convert to algebraic notation and call the onMove callback
-        const fromSquare = `${String.fromCharCode(97 + selectedCol)}${8 - selectedRow}`;
-        const toSquare = `${String.fromCharCode(97 + col)}${8 - row}`;
-        onMove && onMove(`${fromSquare}${toSquare}`);
-      } 
-      // If clicking on another piece of the same color, select that piece instead
-      else if (piece && isPieceOfSameColor(selectedPiece, piece)) {
-        setSelectedSquare([row, col]);
-        const moves = getPossibleMoves(piece, row, col, board);
-        setHighlightedSquares(moves);
-      } 
-      // If clicking on an invalid square, deselect
-      else {
-        setSelectedSquare(null);
-        setHighlightedSquares([]);
-      }
-    } 
-    // If no square is selected and clicking on a piece, select it
-    else if (piece) {
-      setSelectedSquare([row, col]);
-      const moves = getPossibleMoves(piece, row, col, board);
-      setHighlightedSquares(moves);
-    }
-  };
-
-  // Check if two pieces are of the same color
-  const isPieceOfSameColor = (piece1, piece2) => {
-    return (piece1.toLowerCase() === piece1 && piece2.toLowerCase() === piece2) || 
-           (piece1.toUpperCase() === piece1 && piece2.toUpperCase() === piece2);
-  };
-
-  // Get piece image
-  const getPieceImage = (piece) => {
-    if (!piece) return null;
-    
-    const color = piece.toLowerCase() === piece ? 'b' : 'w';
-    const type = piece.toLowerCase();
-    
-    return `../../assets/pieces/${color}${type}.png`;
-  };
-
-  // Determine if a square should be highlighted
-  const isHighlighted = (row, col) => {
-    return highlightedSquares.some(([r, c]) => r === row && c === col);
-  };
-
-  // Determine if a square is part of the last move
-  const isLastMove = (row, col) => {
-    if (!lastMove) return false;
-    
-    const { from, to } = lastMove;
-    return (from[0] === row && from[1] === col) || (to[0] === row && to[1] === col);
-  };
-
-  // Render the board
-  const renderBoard = () => {
-    const boardRows = [];
-    
-    for (let row = 0; row < 8; row++) {
-      const squares = [];
-      
-      for (let col = 0; col < 8; col++) {
-        const isWhiteSquare = (row + col) % 2 === 0;
-        const piece = board[row] && board[row][col];
-        const isSelected = selectedSquare && selectedSquare[0] === row && selectedSquare[1] === col;
-        
-        squares.push(
-          <div 
-            key={`${row}-${col}`}
-            className={`
-              square 
-              ${isWhiteSquare ? 'white-square' : 'black-square'}
-              ${isSelected ? 'selected' : ''}
-              ${isHighlighted(row, col) ? 'highlighted' : ''}
-              ${isLastMove(row, col) ? 'last-move' : ''}
-            `}
-            onClick={() => handleSquareClick(row, col)}
-          >
-            {piece && (
-              <div className="piece">
-                <img src={getPieceImage(piece)} alt={piece} />
-              </div>
-            )}
-            {showHints && isHighlighted(row, col) && (
-              <div className="hint-dot"></div>
-            )}
-            {/* Coordinates */}
-            {col === 0 && (
-              <div className="coordinate rank">
-                {orientation === 'white' ? 8 - row : row + 1}
-              </div>
-            )}
-            {row === 7 && (
-              <div className="coordinate file">
-                {orientation === 'white' 
-                  ? String.fromCharCode(97 + col) 
-                  : String.fromCharCode(104 - col)}
-              </div>
-            )}
-          </div>
-        );
-      }
-      
-      boardRows.push(
-        <div key={row} className="board-row">
-          {squares}
-        </div>
+      const foundMove = moves.find(
+        (m) => m.from === moveFrom && m.to === square
       );
+      
+      if (foundMove) {
+        // Handle pawn promotion
+        if (foundMove.promotion) {
+          setMoveTo(square);
+          setShowPromotionDialog(true);
+          return;
+        }
+        
+        // Make the move
+        try {
+          const moveResult = game.move({
+            from: moveFrom,
+            to: square
+          });
+          
+          if (moveResult) {
+            setLastMove({ from: moveFrom, to: square });
+            setGame(new Chess(game.fen()));
+            setMoveFrom('');
+            setOptionSquares({});
+            
+            // Call the onMove callback
+            onMove && onMove(`${moveFrom}${square}`);
+          }
+        } catch (error) {
+          console.error('Invalid move:', error);
+        }
+      } else {
+        // If the clicked square is not a valid move, check if it's a new piece selection
+        const hasMoveOptions = getMoveOptions(square);
+        
+        if (hasMoveOptions) {
+          setMoveFrom(square);
+        } else {
+          setMoveFrom('');
+          setOptionSquares({});
+        }
+      }
+    } else {
+      // No piece is selected yet, so select the piece on the clicked square
+      const hasMoveOptions = getMoveOptions(square);
+      
+      if (hasMoveOptions) {
+        setMoveFrom(square);
+      }
+    }
+  }, [moveFrom, game, getMoveOptions, allowMoves, onMove]);
+
+  // Handle piece drop (drag and drop)
+  const onDrop = useCallback((sourceSquare, targetSquare) => {
+    if (!allowMoves) return false;
+    
+    try {
+      const move = game.move({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: 'q' // Always promote to queen for simplicity
+      });
+      
+      if (move) {
+        setLastMove({ from: sourceSquare, to: targetSquare });
+        setGame(new Chess(game.fen()));
+        
+        // Call the onMove callback
+        onMove && onMove(`${sourceSquare}${targetSquare}`);
+        return true;
+      }
+    } catch (error) {
+      console.error('Invalid move:', error);
+      return false;
     }
     
-    return (
-      <div className={`board ${orientation === 'black' ? 'flipped' : ''}`}>
-        {boardRows}
-      </div>
-    );
+    return false;
+  }, [game, allowMoves, onMove]);
+
+  // Handle right-click to mark squares
+  const onSquareRightClick = useCallback((square) => {
+    const color = rightClickedSquares[square]
+      ? undefined
+      : 'rgba(255, 0, 0, 0.4)';
+    
+    setRightClickedSquares({
+      ...rightClickedSquares,
+      [square]: color
+    });
+  }, [rightClickedSquares]);
+
+  // Combine all square styles
+  const combinedSquareStyles = {
+    ...optionSquares,
+    ...rightClickedSquares,
+    ...customSquareStyles,
+    ...(lastMove ? {
+      [lastMove.from]: { backgroundColor: 'rgba(173, 216, 230, 0.5)' },
+      [lastMove.to]: { backgroundColor: 'rgba(173, 216, 230, 0.5)' }
+    } : {})
   };
 
   return (
-    <div className="chessboard-container">
-      {renderBoard()}
-    </div>
+    <Box 
+      component={motion.div}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      sx={{ 
+        width: '100%', 
+        maxWidth: 600, 
+        margin: '0 auto',
+        '& .promotion-piece-q': {
+          '&:hover': {
+            transform: 'scale(1.1)',
+            transition: 'transform 0.2s'
+          }
+        }
+      }}
+    >
+      <ChessboardContainer elevation={3}>
+        <Chessboard
+          id="ChessPuzzleBoard"
+          position={game.fen()}
+          onSquareClick={onSquareClick}
+          onPieceDrop={onDrop}
+          onSquareRightClick={onSquareRightClick}
+          customSquareStyles={combinedSquareStyles}
+          boardOrientation={orientation}
+          areArrowsAllowed={true}
+          showBoardNotation={true}
+          animationDuration={200}
+          boardWidth={undefined}
+          customDarkSquareStyle={{ backgroundColor: theme.palette.mode === 'dark' ? '#779556' : '#b58863' }}
+          customLightSquareStyle={{ backgroundColor: theme.palette.mode === 'dark' ? '#edeed1' : '#f0d9b5' }}
+          customPieces={{
+            // You can customize pieces here if needed
+          }}
+          promotionToSquare={moveTo}
+          showPromotionDialog={showPromotionDialog}
+          onPromotionPieceSelect={(piece) => {
+            // Handle promotion
+            if (moveFrom && moveTo) {
+              try {
+                const promotion = piece[1].toLowerCase();
+                const move = game.move({
+                  from: moveFrom,
+                  to: moveTo,
+                  promotion
+                });
+                
+                if (move) {
+                  setLastMove({ from: moveFrom, to: moveTo });
+                  setGame(new Chess(game.fen()));
+                  
+                  // Call the onMove callback
+                  onMove && onMove(`${moveFrom}${moveTo}${promotion}`);
+                }
+              } catch (error) {
+                console.error('Invalid promotion:', error);
+              }
+            }
+            
+            setMoveFrom('');
+            setMoveTo(null);
+            setShowPromotionDialog(false);
+            setOptionSquares({});
+          }}
+        />
+      </ChessboardContainer>
+    </Box>
   );
 };
 
-export default Chessboard;
+export default ChessboardComponent;

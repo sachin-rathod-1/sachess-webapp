@@ -1,228 +1,115 @@
-/* Global Styles */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* Custom styles that complement Material UI */
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-body {
-  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f8f9fa;
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
-.main-content {
-  flex: 1;
+/* Global animation classes */
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-a {
-  text-decoration: none;
-  color: #4d90fe;
+.animate-slideUp {
+  animation: slideUp 0.5s ease-out;
 }
 
-button {
-  cursor: pointer;
+.animate-pulse {
+  animation: pulse 2s infinite;
 }
 
-/* Home Page Styles */
-.home-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.hero-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 60px 0;
-  gap: 40px;
-}
-
-.hero-content {
-  flex: 1;
-}
-
-.hero-content h1 {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  color: #333;
-  line-height: 1.2;
-}
-
-.hero-content p {
-  font-size: 1.1rem;
-  margin-bottom: 30px;
-  color: #666;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 15px;
-}
-
-.primary-button, .secondary-button, .cta-button {
-  padding: 12px 24px;
-  border-radius: 4px;
-  font-weight: 500;
-  font-size: 1rem;
+/* Chess board customizations */
+.chess-board {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
 }
 
-.primary-button {
-  background-color: #4d90fe;
-  color: white;
-  border: none;
+.chess-board:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
 }
 
-.primary-button:hover {
-  background-color: #357ae8;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.secondary-button {
-  background-color: transparent;
-  color: #4d90fe;
-  border: 1px solid #4d90fe;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.secondary-button:hover {
-  background-color: rgba(77, 144, 254, 0.1);
-}
-
-.hero-image {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.chess-board-preview {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1 / 1;
-  background-image: url('https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/PedroPinhata/phpZIuH5s.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.features-section {
-  padding: 80px 0;
-  text-align: center;
-}
-
-.features-section h2 {
-  font-size: 2rem;
-  margin-bottom: 50px;
-  color: #333;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
-}
-
-.feature-card {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.feature-icon {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-}
-
-.feature-card h3 {
-  font-size: 1.3rem;
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.feature-card p {
-  color: #666;
-}
-
-.cta-section {
-  background-color: #f0f7ff;
-  padding: 80px 20px;
-  text-align: center;
-  border-radius: 8px;
-  margin-bottom: 80px;
-}
-
-.cta-section h2 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.cta-section p {
-  font-size: 1.1rem;
-  margin-bottom: 30px;
-  color: #666;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.cta-button {
-  background-color: #4d90fe;
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  font-size: 1.1rem;
+::-webkit-scrollbar-thumb {
+  background: #888;
   border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Utility classes */
+.text-gradient {
+  background: linear-gradient(90deg, #4d90fe, #357ae8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   display: inline-block;
 }
 
-.cta-button:hover {
-  background-color: #357ae8;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(77, 144, 254, 0.3);
+.hover-lift {
+  transition: transform 0.3s ease;
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .hero-section {
-    flex-direction: column;
-    padding: 40px 0;
+.hover-lift:hover {
+  transform: translateY(-5px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .hide-on-mobile {
+    display: none !important;
   }
-  
-  .hero-content {
-    text-align: center;
-  }
-  
-  .hero-buttons {
-    justify-content: center;
-  }
-  
-  .hero-content h1 {
-    font-size: 2rem;
-  }
-  
-  .features-section {
-    padding: 60px 0;
-  }
-  
-  .cta-section {
-    padding: 60px 20px;
-  }
+}
+
+/* Chess piece animation */
+.chess-piece {
+  transition: transform 0.3s ease;
+}
+
+.chess-piece:hover {
+  transform: scale(1.1);
+}
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+  opacity: 1;
+}
+
+.page-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
 }
