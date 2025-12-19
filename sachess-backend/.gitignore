@@ -1,0 +1,24 @@
+# Backend-specific ignores (most of these are also covered globally, kept here for local clarity)
+
+# Maven build output (see also root **/target/)
+target/
+
+# Logs (also covered globally by *.log)
+*.log
+
+# IDE / project files (also covered globally)
+.idea/
+*.iml
+out/
+.project
+.classpath
+.settings/
+.vscode/
+
+# OS / misc (also covered globally)
+.DS_Store
+Thumbs.db
+
+# Env / secrets (also covered globally)
+.env
+.env.*
